@@ -12,16 +12,31 @@ exports.create = (text, callback) => {
   counter.getNextUniqueId((err, datastring)=>{
     id = datastring;
     items[id] = text;
-    callback(null, { id, text });
+    //I think we want to write the file here using fs.writeFile
+    
+    let filepath = path.join(exports.dataDir, `${datastring}.txt`);
+    fs.writeFile(filepath, text, (err) => {
+      if (err) {
+        throw ('error writing counter');
+      } else {
+        callback(null, { id, text });
+      }
+    });
   });
 };
 
 exports.readAll = (callback) => {
   var data = [];
-  _.each(items, (text, id) => {
-    data.push({ id, text });
+  fs.readdir(exports.dataDir, (err, files) => {
+    _.each(files, (filename) => {
+      let id = filename.slice(0,5);
+      data.push({
+       id: id, 
+       text: id});
+    });
+    callback(null, data);
   });
-  callback(null, data);
+  
 };
 
 exports.readOne = (id, callback) => {
