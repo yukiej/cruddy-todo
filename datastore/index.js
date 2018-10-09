@@ -81,7 +81,7 @@ exports.update = (id, text, callback) => {
             if (err) {
               console.error('error writing file');
             } else {
-              callback(null, {id, text: data});
+              callback(null, {id, text: text});
             }
           });
         } else {
@@ -96,14 +96,15 @@ exports.update = (id, text, callback) => {
 };
   
 exports.delete = (id, callback) => {
-  var item = items[id];
-  delete items[id];
-  if (!item) {
-    // report an error if item not found
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback();
-  }
+  let filename = id + '.txt';
+  fs.unlink(path.join(exports.dataDir, filename), (err) => {
+    if (err) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      callback();
+    }
+  });
+        
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
