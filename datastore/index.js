@@ -31,8 +31,8 @@ exports.readAll = (callback) => {
     _.each(files, (filename) => {
       let id = filename.slice(0,5);
       data.push({
-       id: id, 
-       text: id});
+        id: id, 
+        text: id});
     });
     callback(null, data);
   });
