@@ -29,7 +29,7 @@ exports.readAll = (callback) => {
   var data = [];
   fs.readdir(exports.dataDir, (err, files) => {
     _.each(files, (filename) => {
-      let id = filename.slice(0,5);
+      let id = filename.slice(0, 5);
       data.push({
         id: id, 
         text: id});
@@ -50,12 +50,11 @@ exports.readOne = (id, callback) => {
     } else {
       let notFound = 0;
       _.each(files, (filename) => {
-        if (id === filename.slice(0,5)) {
+        if (id === filename.slice(0, 5)) {
           fs.readFile(path.join(exports.dataDir, filename), 'utf8', (err, data) => {
             if (err) {
               console.error('error reading file');
             } else {
-              found = true;
               callback(null, {id, text: data});
             }
           });
@@ -71,15 +70,31 @@ exports.readOne = (id, callback) => {
 };
 
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+  fs.readdir(exports.dataDir, (err, files) => {
+    if (err) {
+      console.error('error reading directory');
+    } else {
+      let notFound = 0;
+      _.each(files, (filename) => {
+        if (id === filename.slice(0, 5)) {
+          fs.writeFile(path.join(exports.dataDir, filename), text, 'utf8', (err, data) => {
+            if (err) {
+              console.error('error writing file');
+            } else {
+              callback(null, {id, text: data});
+            }
+          });
+        } else {
+          notFound += 1;
+        }
+      });
+      if (notFound === files.length) {
+        callback(new Error(`No item with id: ${id}`));
+      }
+    }
+  });
 };
-
+  
 exports.delete = (id, callback) => {
   var item = items[id];
   delete items[id];
