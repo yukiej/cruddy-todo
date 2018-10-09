@@ -40,6 +40,11 @@ exports.readAll = (callback) => {
 };
 
 exports.readOne = (id, callback) => {
+  //use readdir to get array of all files
+  //iterate over array to see if the file with id is in there
+  //if it is, read the file and return the contents with callback
+  //if it isn't, return error message
+  console.log(callback);
   var text = items[id];
   if (!text) {
     callback(new Error(`No item with id: ${id}`));
