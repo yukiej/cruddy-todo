@@ -44,13 +44,30 @@ exports.readOne = (id, callback) => {
   //iterate over array to see if the file with id is in there
   //if it is, read the file and return the contents with callback
   //if it isn't, return error message
-  console.log(callback);
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  fs.readdir(exports.dataDir, (err, files) => {
+    if (err) {
+      console.error('error reading directory');
+    } else {
+      let notFound = 0;
+      _.each(files, (filename) => {
+        if (id === filename.slice(0,5)) {
+          fs.readFile(path.join(exports.dataDir, filename), 'utf8', (err, data) => {
+            if (err) {
+              console.error('error reading file');
+            } else {
+              found = true;
+              callback(null, {id, text: data});
+            }
+          });
+        } else {
+          notFound += 1;
+        }
+      });
+      if (notFound === files.length) {
+        callback(new Error(`No item with id: ${id}`));
+      }
+    }
+  });
 };
 
 exports.update = (id, text, callback) => {
